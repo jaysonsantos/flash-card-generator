@@ -1,3 +1,5 @@
 *.py[co]
 __pycache__/
 config/
+.mypy_cache/
+.python-version
