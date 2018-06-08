@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from typing import List
 
 from ..reader import TextReader
@@ -40,12 +41,12 @@ class CommandLineClient:
         print(
             "Now I will ask if you know some words and show some examples "
             "you can either go until the end or you can just hit Control-C and "
-            "the flash cards will be generated"
+            "the flash cards will be generated", file=sys.stderr
         )
         try:
             self._ask_user()
         except KeyboardInterrupt:
-            print("User asked to stop")
+            print("User asked to stop", file=sys.stderr)
 
         self._save_all_words_files()
 
@@ -76,7 +77,8 @@ class CommandLineClient:
     def _save_all_words_files(self) -> None:
         print(
             f"Done, saving known words {len(self.reader.known_words)} "
-            f"and unknown words {len(self.reader.unknown_words)}"
+            f"and unknown words {len(self.reader.unknown_words)}",
+            file=sys.stderr
         )
         for words, file_name in [
             (self.reader.known_words, self._known_words_file_name),
