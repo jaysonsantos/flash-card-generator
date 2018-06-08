@@ -7,7 +7,7 @@ pipenv run python -m spacy download de
 pipenv run python -m spacy download fr
 ```
 
-For now you can rrun the code with this:
+For now you can run the code with this:
 ```
 pipenv run python -m learning --help
 ```
