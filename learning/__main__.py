@@ -1,6 +1,7 @@
 import os
 
 import click
+
 from learning.clients import CommandLineClient
 from learning.flash_card import FlashCardGenerator
 from learning.pre_processors import BasePreProcessor
