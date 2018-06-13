@@ -7,14 +7,16 @@ name = "pypi"
 
 [packages]
 
-googletrans = "*"
+"bs4" = "*"
 click = "*"
+googletrans = "*"
+lxml = "*"
 spacy = "*"
 
 
 [dev-packages]
 
-flake8 = "*"
+"flake8" = "*"
 ipdb = "*"
 ipython = "*"
 mypy = "*"
