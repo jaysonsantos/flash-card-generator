@@ -1,1 +1,1 @@
-from .command_line import CommandLineClient
+from .command_line import CommandLineClient  # noqa

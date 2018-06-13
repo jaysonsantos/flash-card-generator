@@ -41,7 +41,8 @@ class CommandLineClient:
         print(
             "Now I will ask if you know some words and show some examples "
             "you can either go until the end or you can just hit Control-C and "
-            "the flash cards will be generated", file=sys.stderr
+            "the flash cards will be generated",
+            file=sys.stderr,
         )
         try:
             self._ask_user()
@@ -51,12 +52,14 @@ class CommandLineClient:
         self._save_all_words_files()
 
     def _ask_user(self) -> None:
-        for word, examples in self.reader.iterate_unseen_words():
+        for word, examples in self.reader.iterate_unseen_words_with_examples():
             chosen_examples = '", "'.join(examples[:3])
             self._process_word(word, chosen_examples, len(examples))
 
     def _process_word(self, word, chosen_examples, used_times) -> None:
         while True:
+            unseen_words_number = len(self.reader.get_unseen_words())
+            print(f"Number of unseen words: {unseen_words_number}")
             rv = input(
                 "\n"
                 f"Do you know this word {word!r}?\n"
@@ -78,7 +81,7 @@ class CommandLineClient:
         print(
             f"Done, saving known words {len(self.reader.known_words)} "
             f"and unknown words {len(self.reader.unknown_words)}",
-            file=sys.stderr
+            file=sys.stderr,
         )
         for words, file_name in [
             (self.reader.known_words, self._known_words_file_name),

@@ -1,10 +1,8 @@
-import json
-import os
 import re
-import sys
 from collections import defaultdict
 from typing import Dict, Iterator, List, Set, Tuple
 
+from .pre_processors import BasePreProcessor
 from .processors import BaseProcessor
 
 
@@ -15,17 +13,23 @@ class TextReader:
 
     sentences: List[str]
 
-    def __init__(self, text, language, sorted_flash_cards=True):
-        self.text = text
+    def __init__(self, text, language, pre_processor_name=None, sorted_flash_cards=True):
+        self.text = self.clean_text(text, pre_processor_name)
         self.sorted_flash_cards = sorted_flash_cards
 
         self.language = language
         processor = BaseProcessor.get_processor(language)
-        self.processor = processor(text)
+        self.processor = processor(self.text)
 
         self.known_words = set()
         self.unknown_words = set()
         self.word_tree_sorted = dict()
+
+    def clean_text(self, text, pre_processor_name) -> str:
+        if not pre_processor_name:
+            return text
+        pre_processor = BasePreProcessor.get_pre_processor(pre_processor_name)
+        return pre_processor(text).get_output_text()
 
     def build_tree(self) -> None:
         self._read_sentences()
@@ -55,12 +59,13 @@ class TextReader:
                 continue
             yield clean_word
 
-    def iterate_unseen_words(self) -> Iterator[Tuple[str, List[str]]]:
-        for word, examples in self.word_tree_sorted.items():
-            if word in self.known_words or word in self.unknown_words:
-                continue
-
+    def iterate_unseen_words_with_examples(self) -> Iterator[Tuple[str, List[str]]]:
+        for word in self.get_unseen_words():
+            examples = self.word_tree_sorted[word]
             yield word, [str(example).strip() for example in examples]
+
+    def get_unseen_words(self) -> Set[str]:
+        return self.word_tree_sorted.keys() - self.known_words - self.unknown_words
 
     def iterate_unknown_words(self):
         unknown_words = sorted(self.unknown_words) if self.sorted_flash_cards else self.unknown_words
