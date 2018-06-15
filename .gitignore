@@ -3,3 +3,6 @@ __pycache__/
 config/
 .mypy_cache/
 .python-version
+*.orig
+*.rej
+.pytest_cache/

@@ -76,3 +76,9 @@ class TextReader:
 
     def get_phrases(self, word):
         return self.word_tree_sorted[word]
+
+    def dump_word_tree(self) -> Dict[str, List[str]]:
+        tree = {}
+        for word, phrases in self.word_tree_sorted.items():
+            tree[word] = [phrase.text for phrase in phrases]
+        return tree

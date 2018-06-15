@@ -24,7 +24,7 @@ class FlashCardGenerator:
 
                 f.write("\t")
                 for i, phrase in enumerate(
-                    translator.translate([phrase.text.strip().replace("\n", " ") for phrase in phrases])
+                    translator.translate([word] + [phrase.text.strip().replace("\n", " ") for phrase in phrases])
                 ):
                     if i != 0:
                         f.write("<br />")
