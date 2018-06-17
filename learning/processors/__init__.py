@@ -1,6 +1,7 @@
 from typing import Iterator, Dict, Type, Any
 from spacy.tokens import Span, Token
 import spacy
+from spacy.language import Language
 
 
 class BaseProcessor:
@@ -8,11 +9,24 @@ class BaseProcessor:
     _processors: Dict[str, Type["BaseProcessor"]] = {}
     ignored_symbols = set("[]{}()")
 
-    spacy: Any  # TODO: Use meta class to initialize this
+    _spacy: Any = None
 
     def __init__(self, text):
         self.text = text
-        self.doc = self.spacy(self.text)
+        spacy_instance = self.spacy_instance
+        self.doc = spacy_instance(self.text)
+
+    @property
+    def spacy_instance(self) -> Language:
+        return self._get_or_cache_spacy()
+
+    @classmethod
+    def _get_or_cache_spacy(cls) -> Language:
+        if cls._spacy:
+            return cls._spacy
+
+        cls._spacy = spacy.load(cls.language)
+        return cls._spacy
 
     def is_token_verb(self, token: Token) -> bool:
         return token.pos_ == "VERB"

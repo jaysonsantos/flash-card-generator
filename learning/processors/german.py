@@ -1,6 +1,5 @@
 from typing import Iterator, Optional
 
-import spacy
 from spacy.tokens import Token
 
 from . import BaseProcessor
@@ -8,10 +7,6 @@ from . import BaseProcessor
 
 class GermanProcessor(BaseProcessor):
     language = "de"
-    spacy = spacy.load("de")
-
-    def __init__(self, text):
-        super().__init__(text)
 
     def iterate_words(self, sentence) -> Iterator[str]:
         for token in super().iterate_words(sentence):
