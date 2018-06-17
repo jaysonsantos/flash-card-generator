@@ -1,4 +1,4 @@
-from typing import Iterator, Dict, Type
+from typing import Iterator, Dict, Type, Any
 from spacy.tokens import Span, Token
 import spacy
 
@@ -8,9 +8,10 @@ class BaseProcessor:
     _processors: Dict[str, Type["BaseProcessor"]] = {}
     ignored_symbols = set("[]{}()")
 
+    spacy: Any  # TODO: Use meta class to initialize this
+
     def __init__(self, text):
         self.text = text
-        self.spacy = spacy.load(self.language)
         self.doc = self.spacy(self.text)
 
     def is_token_verb(self, token: Token) -> bool:
