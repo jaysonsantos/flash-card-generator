@@ -15,7 +15,9 @@ RUN pipenv install
 RUN pipenv run python -m spacy download en
 RUN pipenv run python -m spacy download de
 RUN pipenv run python -m spacy download fr
+RUN pipenv run pip install -U gunicorn
 
+ENV PYTHONPATH=/learning
 COPY --chown=learning:learning learning/ /learning/learning
 
 ENTRYPOINT [ "pipenv", "run", "python", "-m", "learning" ]

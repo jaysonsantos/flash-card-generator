@@ -13,7 +13,7 @@ class BaseProcessor:
 
     def __init__(self, text):
         self.text = text
-        spacy_instance = self.spacy_instance
+        spacy_instance = self.spacy_instance  # Assigned to make mypy stop complaining
         self.doc = spacy_instance(self.text)
 
     @property
