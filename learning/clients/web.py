@@ -2,13 +2,31 @@ from collections import defaultdict
 
 from flask import Blueprint, Flask, abort, jsonify, request
 from flask.views import View
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 
 from ..flash_card import FlashCardGenerator
+from ..pre_processors import BasePreProcessor
 from ..processors import BaseProcessor
 from ..reader import TextReader
 
 main_blueprint = Blueprint("main", __name__, url_prefix="/v1")
+
+
+def profile(func):
+    import functools
+    import cProfile
+
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        profiler = cProfile.Profile()
+        profiler.enable()
+        try:
+            return func(*args, **kwargs)
+        finally:
+            profiler.disable()
+            profiler.dump_stats("call.dump")
+
+    return wrapped
 
 
 def create_app() -> Flask:
@@ -20,12 +38,14 @@ def create_app() -> Flask:
 
 class WordTreeSchema(Schema):
     text = fields.String(required=True)
+    pre_processor = fields.String(validate=validate.OneOf(BasePreProcessor.get_pre_processors()))
 
 
 class FlashCardSchema(Schema):
     known_words = fields.List(fields.String(required=True), required=True)
     unknown_words = fields.List(fields.String(required=True), missing=list)
     text = fields.String(required=True)
+    pre_processor = fields.String(validate=validate.OneOf(BasePreProcessor.get_pre_processors()))
 
 
 class BaseApiMixin:
@@ -59,7 +79,7 @@ class BaseApiMixin:
         self.payload = result.data
 
     def initialize_reader(self):
-        self.reader = TextReader(self.payload["text"], self.language)
+        self.reader = TextReader(self.payload["text"], self.language, self.payload.get("pre_processor", None))
         self.reader.build_tree()
 
 
@@ -88,6 +108,7 @@ class WebFlashCardGenerator(BaseApiMixin, View):
 
 class WordTreeGenerator(BaseApiMixin, View):
     methods = ["POST"]
+    # decorators = [profile]
 
     def __init__(self):
         self.schema = WordTreeSchema()
