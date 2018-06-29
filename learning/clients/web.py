@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from flask import Blueprint, Flask, abort, jsonify, request
+from flask import Blueprint, Flask, Response, abort, jsonify, request
 from flask.views import View
 from marshmallow import Schema, fields, validate
 
@@ -29,9 +29,39 @@ def profile(func):
     return wrapped
 
 
+class CORSHandler:
+    # TODO: Cleanup and make it stricter
+    def __init__(self, app):
+        self.app = app
+        self.app.before_request(self.before_request)
+        self.app.after_request(self.after_request)
+
+    def before_request(self):
+        if request.method == "OPTIONS":
+            response = Response()
+            response.headers.extend(
+                {
+                    "Access-Control-Allow-Credentials": "true",
+                    "Access-Control-Allow-Headers": "Accept,Authorization,"
+                    "DNT,X-CustomHeader,"
+                    "Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,"
+                    "Content-Type",
+                    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                    "Access-Control-Max-Age": 1234,
+                }
+            )
+            return response
+        return None
+
+    def after_request(self, response):
+        response.headers.extend({"Access-Control-Allow-Origin": request.headers.get("Origin", "*")})
+        return response
+
+
 def create_app() -> Flask:
     app = Flask(__name__)
     app.register_blueprint(main_blueprint)
+    CORSHandler(app)
 
     return app
 
