@@ -1,5 +1,4 @@
 import pytest
-
 from learning.processors.german import GermanProcessor
 
 

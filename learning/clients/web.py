@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from flask import Blueprint, Flask, abort, jsonify, request
 from flask.views import View
+from flask_cors import CORS
 from marshmallow import Schema, fields, validate
 
 from ..flash_card import FlashCardGenerator
@@ -10,6 +11,7 @@ from ..processors import BaseProcessor
 from ..reader import TextReader
 
 main_blueprint = Blueprint("main", __name__, url_prefix="/v1")
+cors = CORS()
 
 
 def profile(func):
@@ -32,6 +34,7 @@ def profile(func):
 def create_app() -> Flask:
     app = Flask(__name__)
     app.register_blueprint(main_blueprint)
+    cors.init_app(app, resources={"*": {"origins": "*"}})
 
     return app
 

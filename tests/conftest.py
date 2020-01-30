@@ -1,7 +1,6 @@
 import pytest
 from flask import Flask
 from flask.testing import Client
-
 from learning.clients.web import create_app
 
 
